@@ -11,7 +11,7 @@ bot.on("text", async (ctx) => {
         await ctx.sendChatAction("typing");
 
         // 2. Подключаем модель (flash 1.5 — самая быстрая и стабильная в 2026)
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
         // 3. Запрос к ИИ
         const result = await model.generateContent(ctx.message.text);
