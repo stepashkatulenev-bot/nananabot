@@ -16,7 +16,7 @@ const runCommand = (cmd) => {
 
 bot.on("text", async (ctx) => {
     try {
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "models/gemini-1.5-flash" });
         const result = await model.generateContent("You are a Linux bot. Use EXEC: command for actions. User: " + ctx.message.text);
         const text = result.response.text();
         if (text.includes("EXEC:")) {
