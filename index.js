@@ -5,36 +5,36 @@ const { exec } = require("child_process");
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const bot = new Telegraf(process.env.TELEGRAM_TOKEN);
 
-const runCommand = (cmd) => {
-    return new Promise((res) => {
-        exec(cmd, (err, stdout, stderr) => {
-            if (err) return res("Ошибка: " + err.message);
-            res(stdout  stderr  "Готово");
+const runCommand = (command) => {
+    return new Promise((resolve) => {
+        exec(command, (error, stdout, stderr) => {
+            if (error) {
+                resolve("Error: " + error.message);
+                return;
+            }
+            resolve(stdout  stderr  "Success");
         });
     });
 };
 
 bot.on("text", async (ctx) => {
     try {
-        // ИСПОЛЬЗУЕМ ТЕРМИНАЛЬНУЮ ВЕРСИЮ МОДЕЛИ
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-        
-        const result = await model.generateContent("Ты — Linux-терминал с ИИ. Если юзер просит действие, используй формат EXEC: команда. Юзер пишет: " + ctx.message.text);
-        const response = await result.response;
-        const text = response.text();
+        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+        const prompt = System: Linux. Action format EXEC: command. User: ${ctx.message.text};
+        const result = await model.generateContent(prompt);
+        const text = result.response.text();
 
         if (text.includes("EXEC:")) {
             const cmd = text.split("EXEC:")[1].trim();
-            ctx.reply("⚙️ Запускаю: " + cmd);
-            const out = await runCommand(cmd);
-            ctx.reply("📄 Результат:\n" + out);
+            ctx.reply("Running: " + cmd);
+            const output = await runCommand(cmd);
+            ctx.reply("Output:\n" + output);
         } else {
             ctx.reply(text);
         }
     } catch (e) {
-        console.error(e);
-        ctx.reply("Бот временно перегружен или API ключ не активен. Проверь статус в Railway.");
+        ctx.reply("Error: " + e.message);
     }
 });
 
-bot.launch().then(() => console.log("Бот в сети!"));
+bot.launch().then(() => console.log("Bot is running!"));
